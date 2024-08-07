@@ -179,3 +179,112 @@ document.addEventListener('keydown', (e) => {
 
 startButton.addEventListener('click', startGame);
 restartButton.addEventListener('click', startGame);
+
+const instructionsButton = document.getElementById('instructions-button');
+const instructionsScreen = document.getElementById('instructions-screen');
+const backButton = document.getElementById('back-button');
+const powerUpIndicator = document.getElementById('power-up-indicator');
+
+let level = 1;
+let coins = 0;
+let activePowerUp = null;
+let enemyDragonInterval;
+
+instructionsButton.addEventListener('click', () => {
+    startScreen.classList.add('hidden');
+    instructionsScreen.classList.remove('hidden');
+});
+
+backButton.addEventListener('click', () => {
+    instructionsScreen.classList.add('hidden');
+    startScreen.classList.remove('hidden');
+});
+
+function createEnemyDragon() {
+    const enemyDragon = document.createElement('div');
+    enemyDragon.classList.add('enemy-dragon');
+    enemyDragon.style.left = '800px';
+    enemyDragon.style.top = Math.random() * 350 + 'px';
+    gameScreen.appendChild(enemyDragon);
+
+    const enemyDragonLoop = setInterval(() => {
+        const left = parseInt(enemyDragon.style.left);
+        if (left > -50) {
+            enemyDragon.style.left = (left - 4) + 'px';
+            checkCollision(enemyDragon, 'enemy-dragon');
+        } else {
+            clearInterval(enemyDragonLoop);
+            gameScreen.removeChild(enemyDragon);
+        }
+    }, 50);
+}
+
+function createCoin() {
+    const coin = document.createElement('div');
+    coin.classList.add('coin');
+    coin.style.left = '800px';
+    coin.style.top = Math.random() * 370 + 'px';
+    gameScreen.appendChild(coin);
+
+    const coinLoop = setInterval(() => {
+        const left = parseInt(coin.style.left);
+        if (left > -20) {
+            coin.style.left = (left - 3) + 'px';
+            checkCollision(coin, 'coin');
+        } else {
+            clearInterval(coinLoop);
+            gameScreen.removeChild(coin);
+        }
+    }, 50);
+}
+
+function checkCollision(element, type) {
+    // ... (existing collision code)
+
+    if (
+        dragonRect.left < elementRect.right &&
+        dragonRect.right > elementRect.left &&
+        dragonRect.top < elementRect.bottom &&
+        dragonRect.bottom > elementRect.top
+    ) {
+        switch (type) {
+            case 'fireball':
+                score += 10;
+                updateScore();
+                gameScreen.removeChild(element);
+                createExplosion(elementRect.left, elementRect.top);
+                break;
+            case 'obstacle':
+                if (!isInvincible) {
+                    health -= 20;
+                    updateHealthBar();
+                    createExplosion(elementRect.left, elementRect.top);
+                    if (health <= 0) {
+                        gameOver();
+                    }
+                }
+                break;
+            case 'power-up':
+                activatePowerUp();
+                gameScreen.removeChild(element);
+                break;
+            case 'enemy-dragon':
+                if (!isInvincible) {
+                    health -= 30;
+                    updateHealthBar();
+                    createExplosion(elementRect.left, elementRect.top);
+                    if (health <= 0) {
+                        gameOver();
+                    }
+                }
+                gameScreen.removeChild(element);
+                break;
+            case 'coin':
+                coins++;
+                updateScore();
+                gameScreen.removeChild(element);
+                break;
+        }
+    }
+}
+
