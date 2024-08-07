@@ -59,7 +59,107 @@ body {
 
 .coin {
     position: absolute;
-    width: 20px;
+    width: 20px;* {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Arial', sans-serif;
+    }
+    
+    body {
+        background: linear-gradient(to bottom, #141E30, #243B55);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        color: #ffffff;
+    }
+    
+    h1 {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        text-align: center;
+        animation: fadeIn 2s ease-in-out;
+    }
+    
+    .container {
+        background: rgba(0, 0, 0, 0.8);
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.6);
+        text-align: center;
+        max-width: 600px;
+        width: 100%;
+        animation: slideIn 1s ease-in-out;
+    }
+    
+    .container p {
+        font-size: 1.2rem;
+        line-height: 1.5;
+        margin-bottom: 1.5rem;
+    }
+    
+    .dragon-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+    }
+    
+    .dragon {
+        width: 200px;
+        height: 200px;
+        background: url('dragon.png') no-repeat center center/contain;
+        animation: float 3s ease-in-out infinite;
+    }
+    
+    .button-container {
+        margin-top: 1rem;
+    }
+    
+    button {
+        padding: 10px 20px;
+        font-size: 1rem;
+        font-weight: bold;
+        color: #ffffff;
+        background: #FF4B2B;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
+    }
+    
+    button:hover {
+        background: #FF416C;
+        transform: scale(1.1);
+    }
+    
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+    
+    @keyframes slideIn {
+        from {
+            transform: translateY(-100%);
+        }
+        to {
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes float {
+        0%, 100% {
+            transform: translateY(0);
+        }
+        50% {
+            transform: translateY(-20px);
+        }
+    }
+    
     height: 20px;
     background: url('coin.png') no-repeat center center / contain;
 }
