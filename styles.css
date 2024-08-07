@@ -6,9 +6,9 @@
 }
 
 body {
-    font-family: 'Press Start 2P', Arial, sans-serif;
-    background-color: #1b262c;
-    color: #bbe1fa;
+    font-family: 'Press Start 2P', cursive;
+    background-color: #0c0c0c;
+    color: #ffffff;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -21,193 +21,295 @@ body {
     position: relative;
     width: 800px;
     height: 600px;
-    border: 3px solid #0f4c75;
-    background: linear-gradient(to bottom, #3282b8, #0f4c75);
+    border: 4px solid #4a4a4a;
+    background: linear-gradient(to bottom, #1a2a6c, #b21f1f, #fdbb2d);
     overflow: hidden;
-    border-radius: 20px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
-    animation: fadeIn 1.5s ease-in-out;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
 }
 
-/* Dragon and Game Elements */
-#dragon, .fireball, .obstacle, .power-up, .enemy-dragon, .coin, .explosion {
-    position: absolute;
-}
-
-#dragon {
-    width: 80px;
-    height: 60px;
-    background: url('dragon.png') no-repeat center center / contain;
-    transition: top 0.1s, left 0.1s;
-}
-
-.fireball {
-    width: 25px;
-    height: 25px;
-    background: url('fireball.png') no-repeat center center / contain;
-    animation: spin 1s linear infinite;
-}
-
-.obstacle {
-    width: 50px;
-    height: 50px;
-    background: url('obstacle.png') no-repeat center center / contain;
-}
-
-.power-up {
-    width: 35px;
-    height: 35px;
-    background: url('power-up.png') no-repeat center center / contain;
-    animation: pulse 1.5s infinite;
-}
-
-.enemy-dragon {
-    width: 70px;
-    height: 50px;
-    background: url('enemy-dragon.png') no-repeat center center / contain;
-}
-
-.coin {
-    width: 25px;
-    height: 25px;
-    background: url('coin.png') no-repeat center center / contain;
-    animation: bounce 1s infinite;
-}
-
-.explosion {
-    width: 50px;
-    height: 50px;
-    background: url('explosion.png') no-repeat center center / contain;
-}
-
-/* UI Elements */
-#score, #power-up-indicator, #mission-indicator, #level-indicator {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    font-size: 18px;
-    background: rgba(0, 0, 0, 0.7);
-    padding: 10px;
-    border-radius: 5px;
-    margin-bottom: 10px;
-    text-align: center;
-}
-
-#health-bar {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    width: 200px;
-    height: 20px;
-    border: 2px solid #bbe1fa;
-    border-radius: 10px;
-    overflow: hidden;
-    background: rgba(0, 0, 0, 0.7);
-}
-
-#health-fill {
-    height: 100%;
-    width: 100%;
-    background-color: #ff6347;
-    transition: width 0.2s;
-}
-
-/* Screens and Buttons */
+/* Screens */
 .screen {
     position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
-    display: none;
-    justify-content: center;
-    align-items: center;
-    background: rgba(0, 0, 0, 0.9);
-    color: #bbe1fa;
-    text-align: center;
-    animation: fadeIn 1s ease-in-out;
-}
-
-#start-screen, #game-over-screen, #instructions-screen, #high-scores-screen, #pause-screen {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    background-color: rgba(0, 0, 0, 0.8);
+    z-index: 10;
 }
 
+/* Start Screen */
+#start-screen h1 {
+    font-size: 48px;
+    color: #ffd700;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    margin-bottom: 30px;
+    animation: glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+    from {
+        text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #fff, 0 0 20px #ffd700, 0 0 35px #ffd700, 0 0 40px #ffd700, 0 0 50px #ffd700, 0 0 75px #ffd700;
+    }
+    to {
+        text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #fff, 0 0 40px #ffd700, 0 0 70px #ffd700, 0 0 80px #ffd700, 0 0 100px #ffd700, 0 0 150px #ffd700;
+    }
+}
+
+/* Buttons */
 .button {
-    margin: 10px;
-    padding: 15px 30px;
-    background-color: #0f4c75;
+    background-color: #4CAF50;
     border: none;
-    border-radius: 5px;
-    color: #bbe1fa;
-    font-size: 18px;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 10px 2px;
     cursor: pointer;
-    transition: background-color 0.3s, transform 0.3s;
+    transition: all 0.3s ease;
+    border-radius: 5px;
 }
 
 .button:hover {
-    background-color: #3282b8;
-    transform: scale(1.1);
+    background-color: #45a049;
+    transform: scale(1.05);
 }
 
-#game-over-screen h2, #start-screen h2, #instructions-screen h2, #high-scores-screen h2 {
-    margin: 20px 0;
-    font-size: 26px;
+/* Game Screen */
+#game-screen {
+    position: relative;
 }
 
-#player-name {
-    padding: 10px;
-    font-size: 18px;
-    margin: 10px;
-    border: 2px solid #bbe1fa;
-    border-radius: 5px;
-    background: rgba(0, 0, 0, 0.7);
-    color: #bbe1fa;
+/* Player Dragon */
+#dragon {
+    position: absolute;
+    width: 80px;
+    height: 60px;
+    background-image: url('dragon.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    transition: transform 0.1s ease;
 }
 
-#high-scores-list {
-    list-style: none;
-    padding: 0;
+#dragon.breathing-fire {
+    animation: breathe-fire 0.5s infinite alternate;
 }
 
-#high-scores-list li {
-    margin: 5px 0;
-    font-size: 18px;
+@keyframes breathe-fire {
+    from { filter: brightness(1); }
+    to { filter: brightness(1.5) hue-rotate(30deg); }
 }
 
-/* Animations */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
+/* Enemy Dragon */
+.enemy-dragon {
+    position: absolute;
+    width: 70px;
+    height: 50px;
+    background-image: url('enemy-dragon.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+/* Fireball */
+.fireball {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background-image: url('fireball.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    animation: rotate 1s linear infinite;
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Obstacle */
+.obstacle {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    background-image: url('obstacle.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+/* Power-up */
+.power-up {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    animation: pulse 1s infinite alternate;
+}
+
+.power-up.shield { background-image: url('shield-powerup.png'); }
+.power-up.speed { background-image: url('speed-powerup.png'); }
+.power-up.health { background-image: url('health-powerup.png'); }
+
+@keyframes pulse {
+    from { transform: scale(1); }
+    to { transform: scale(1.1); }
+}
+
+/* Coin */
+.coin {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background-image: url('coin.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
-    from {
-        transform: rotate(0deg);
+    from { transform: rotateY(0deg); }
+    to { transform: rotateY(360deg); }
+}
+
+/* UI Elements */
+#score, #health-bar, #mission-indicator, #level-indicator {
+    position: absolute;
+    padding: 10px;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 5px;
+}
+
+#score {
+    top: 10px;
+    left: 10px;
+}
+
+#health-bar {
+    top: 10px;
+    right: 10px;
+    width: 200px;
+    height: 20px;
+    background-color: #ff0000;
+}
+
+#health-fill {
+    height: 100%;
+    background-color: #00ff00;
+    transition: width 0.3s ease;
+}
+
+#mission-indicator {
+    bottom: 10px;
+    left: 10px;
+}
+
+#level-indicator {
+    bottom: 10px;
+    right: 10px;
+}
+
+/* Game Over Screen */
+#game-over-screen h2 {
+    font-size: 36px;
+    color: #ff0000;
+    margin-bottom: 20px;
+}
+
+#final-score {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+#player-name {
+    font-size: 18px;
+    padding: 10px;
+    margin-bottom: 20px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-bottom: 2px solid #ffffff;
+    color: #ffffff;
+}
+
+/* Instructions Screen */
+#instructions-screen ul {
+    list-style-type: none;
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+#instructions-screen li {
+    margin-bottom: 10px;
+}
+
+/* High Scores Screen */
+#high-scores-screen ol {
+    list-style-type: none;
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+#high-scores-screen li {
+    margin-bottom: 10px;
+    font-size: 18px;
+}
+
+/* Pause Screen */
+#pause-screen h2 {
+    font-size: 36px;
+    color: #ffd700;
+    margin-bottom: 20px;
+}
+
+/* Responsive Design */
+@media (max-width: 820px) {
+    #game-container {
+        width: 100%;
+        height: 100vh;
+        border: none;
     }
-    to {
-        transform: rotate(360deg);
+
+    .button {
+        font-size: 14px;
+        padding: 10px 20px;
+    }
+
+    #start-screen h1 {
+        font-size: 36px;
     }
 }
 
-@keyframes pulse {
-    0%, 100% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.1);
-    }
+/* Additional Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
-@keyframes bounce {
-    0%, 100% {
-        transform: translateY(0);
-    }
-    50% {
-        transform: translateY(-10px);
-    }
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes shake {
+    0% { transform: translate(1px, 1px) rotate(0deg); }
+    10% { transform: translate(-1px, -2px) rotate(-1deg); }
+    20% { transform: translate(-3px, 0px) rotate(1deg); }
+    30% { transform: translate(3px, 2px) rotate(0deg); }
+    40% { transform: translate(1px, -1px) rotate(1deg); }
+    50% { transform: translate(-1px, 2px) rotate(-1deg); }
+    60% { transform: translate(-3px, 1px) rotate(0deg); }
+    70% { transform: translate(3px, 1px) rotate(-1deg); }
+    80% { transform: translate(-1px, -1px) rotate(1deg); }
+    90% { transform: translate(1px, 2px) rotate(0deg); }
+    100% { transform: translate(1px, -2px) rotate(-1deg); }
+}
+
+.shake {
+    animation: shake 0.5s;
 }
