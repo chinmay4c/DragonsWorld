@@ -9,53 +9,48 @@
 </head>
 <body>
     <div id="game-container">
-        <div id="start-screen">
+        <div id="start-screen" class="screen">
             <h1>Dragon World</h1>
-            <button id="start-button">Start Game</button>
-            <button id="instructions-button">Instructions</button>
-            <button id="high-scores-button">High Scores</button>
+            <button id="start-button" class="button">Start Game</button>
+            <button id="instructions-button" class="button">Instructions</button>
+            <button id="high-scores-button" class="button">High Scores</button>
         </div>
-        <div id="instructions-screen" class="hidden">
+        <div id="instructions-screen" class="screen">
             <h2>How to Play</h2>
             <ul>
-                <li>Use arrow keys to move the dragon</li>
-                <li>Collect fireballs to increase your score</li>
-                <li>Avoid obstacles and enemy dragons</li>
+                <li>Use arrow keys to move your dragon</li>
+                <li>Press spacebar to breathe fire</li>
+                <li>Defeat enemy dragons and avoid obstacles</li>
                 <li>Collect power-ups for special abilities</li>
                 <li>Gather coins for extra points</li>
-                <li>Complete missions for bonuses</li>
+                <li>Complete missions to level up</li>
             </ul>
-            <button id="back-button">Back to Menu</button>
+            <button id="back-button" class="button">Back to Menu</button>
         </div>
-        <div id="high-scores-screen" class="hidden">
+        <div id="high-scores-screen" class="screen">
             <h2>High Scores</h2>
             <ol id="high-scores-list"></ol>
-            <button id="back-from-scores-button">Back to Menu</button>
+            <button id="back-from-scores-button" class="button">Back to Menu</button>
         </div>
-        <div id="game-screen" class="hidden">
+        <div id="game-screen">
             <div id="dragon"></div>
-            <div id="score-container">
-                <div id="score">Score: 0</div>
-                <div id="coins">Coins: 0</div>
-            </div>
-            <div id="health-bar">
-                <div id="health-fill"></div>
-            </div>
+            <div id="score">Score: 0</div>
+            <div id="health-bar"><div id="health-fill"></div></div>
             <div id="power-up-indicator"></div>
-            <div id="level-indicator">Level: 1</div>
             <div id="mission-indicator"></div>
+            <div id="level-indicator">Level: 1</div>
         </div>
-        <div id="game-over-screen" class="hidden">
+        <div id="game-over-screen" class="screen">
             <h2>Game Over</h2>
             <p id="final-score"></p>
             <input type="text" id="player-name" placeholder="Enter your name">
-            <button id="submit-score">Submit Score</button>
-            <button id="restart-button">Play Again</button>
+            <button id="submit-score" class="button">Submit Score</button>
+            <button id="restart-button" class="button">Play Again</button>
         </div>
-        <div id="pause-screen" class="hidden">
+        <div id="pause-screen" class="screen">
             <h2>Paused</h2>
-            <button id="resume-button">Resume</button>
-            <button id="quit-button">Quit to Menu</button>
+            <button id="resume-button" class="button">Resume</button>
+            <button id="quit-button" class="button">Quit to Menu</button>
         </div>
     </div>
     <script src="script.js"></script>
