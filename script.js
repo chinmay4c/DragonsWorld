@@ -8,6 +8,21 @@ const gameOverScreen = document.getElementById('game-over-screen');
 const startButton = document.getElementById('start-button');
 const restartButton = document.getElementById('restart-button');
 const finalScoreElement = document.getElementById('final-score');
+const instructionsButton = document.getElementById('instructions-button');
+const instructionsScreen = document.getElementById('instructions-screen');
+const backButton = document.getElementById('back-button');
+const powerUpIndicator = document.getElementById('power-up-indicator');
+const highScoresButton = document.getElementById('high-scores-button');
+const highScoresScreen = document.getElementById('high-scores-screen');
+const backFromScoresButton = document.getElementById('back-from-scores-button');
+const highScoresList = document.getElementById('high-scores-list');
+const pauseScreen = document.getElementById('pause-screen');
+const resumeButton = document.getElementById('resume-button');
+const quitButton = document.getElementById('quit-button');
+const playerNameInput = document.getElementById('player-name');
+const submitScoreButton = document.getElementById('submit-score');
+const missionIndicator = document.getElementById('mission-indicator');
+const levelIndicator = document.getElementById('level-indicator');
 
 let dragonX = 0;
 let dragonY = 200;
@@ -17,24 +32,35 @@ let gameLoop;
 let fireballInterval;
 let obstacleInterval;
 let powerUpInterval;
+let enemyDragonInterval;
+let coinInterval;
 let isInvincible = false;
+let level = 1;
+let coins = 0;
+let activePowerUp = null;
+let highScores = [];
+let currentMission = null;
+let isPaused = false;
+let gameStartTime;
 
 function updateDragonPosition() {
     dragon.style.left = dragonX + 'px';
     dragon.style.top = dragonY + 'px';
 }
 
-function createFireball() {
+function createFireball(angle = 0) {
     const fireball = document.createElement('div');
     fireball.classList.add('fireball');
-    fireball.style.left = '800px';
-    fireball.style.top = Math.random() * 380 + 'px';
+    fireball.style.left = `${dragonX + 60}px`;
+    fireball.style.top = `${dragonY + 20}px`;
     gameScreen.appendChild(fireball);
 
     const fireballLoop = setInterval(() => {
         const left = parseInt(fireball.style.left);
-        if (left > -20) {
-            fireball.style.left = (left - 5) + 'px';
+        const top = parseInt(fireball.style.top);
+        if (left < 800 && top > 0 && top < 400) {
+            fireball.style.left = (left + 5 * Math.cos(angle * Math.PI / 180)) + 'px';
+            fireball.style.top = (top + 5 * Math.sin(angle * Math.PI / 180)) + 'px';
             checkCollision(fireball, 'fireball');
         } else {
             clearInterval(fireballLoop);
@@ -65,8 +91,11 @@ function createObstacle() {
 }
 
 function createPowerUp() {
+    const powerUpTypes = ['shield', 'speed', 'magnet', 'multi-shot', 'health'];
+    const type = powerUpTypes[Math.floor(Math.random() * powerUpTypes.length)];
     const powerUp = document.createElement('div');
     powerUp.classList.add('power-up');
+    powerUp.dataset.type = type;
     powerUp.style.left = '800px';
     powerUp.style.top = Math.random() * 370 + 'px';
     gameScreen.appendChild(powerUp);
@@ -82,123 +111,6 @@ function createPowerUp() {
         }
     }, 50);
 }
-
-function checkCollision(element, type) {
-    const dragonRect = dragon.getBoundingClientRect();
-    const elementRect = element.getBoundingClientRect();
-
-    if (
-        dragonRect.left < elementRect.right &&
-        dragonRect.right > elementRect.left &&
-        dragonRect.top < elementRect.bottom &&
-        dragonRect.bottom > elementRect.top
-    ) {
-        if (type === 'fireball') {
-            score++;
-            scoreElement.textContent = `Score: ${score}`;
-            gameScreen.removeChild(element);
-        } else if (type === 'obstacle' && !isInvincible) {
-            health -= 20;
-            updateHealthBar();
-            if (health <= 0) {
-                gameOver();
-            }
-        } else if (type === 'power-up') {
-            activatePowerUp();
-            gameScreen.removeChild(element);
-        }
-    }
-}
-
-function updateHealthBar() {
-    healthFill.style.width = `${health}%`;
-}
-
-function activatePowerUp() {
-    isInvincible = true;
-    dragon.style.filter = 'brightness(1.5) hue-rotate(90deg)';
-    setTimeout(() => {
-        isInvincible = false;
-        dragon.style.filter = 'none';
-    }, 5000);
-}
-
-function gameOver() {
-    clearInterval(gameLoop);
-    clearInterval(fireballInterval);
-    clearInterval(obstacleInterval);
-    clearInterval(powerUpInterval);
-    gameScreen.classList.add('hidden');
-    gameOverScreen.classList.remove('hidden');
-    finalScoreElement.textContent = `Final Score: ${score}`;
-}
-
-function startGame() {
-    dragonX = 0;
-    dragonY = 200;
-    score = 0;
-    health = 100;
-    scoreElement.textContent = 'Score: 0';
-    updateHealthBar();
-    updateDragonPosition();
-
-    startScreen.classList.add('hidden');
-    gameScreen.classList.remove('hidden');
-    gameOverScreen.classList.add('hidden');
-
-    gameLoop = setInterval(() => {
-        dragonX += 1;
-        if (dragonX > 750) {
-            gameOver();
-        }
-        updateDragonPosition();
-    }, 50);
-
-    fireballInterval = setInterval(createFireball, 2000);
-    obstacleInterval = setInterval(createObstacle, 3000);
-    powerUpInterval = setInterval(createPowerUp, 10000);
-}
-
-document.addEventListener('keydown', (e) => {
-    switch (e.key) {
-        case 'ArrowUp':
-            if (dragonY > 0) dragonY -= 10;
-            break;
-        case 'ArrowDown':
-            if (dragonY < 360) dragonY += 10;
-            break;
-        case 'ArrowLeft':
-            if (dragonX > 0) dragonX -= 10;
-            break;
-        case 'ArrowRight':
-            if (dragonX < 740) dragonX += 10;
-            break;
-    }
-    updateDragonPosition();
-});
-
-startButton.addEventListener('click', startGame);
-restartButton.addEventListener('click', startGame);
-
-const instructionsButton = document.getElementById('instructions-button');
-const instructionsScreen = document.getElementById('instructions-screen');
-const backButton = document.getElementById('back-button');
-const powerUpIndicator = document.getElementById('power-up-indicator');
-
-let level = 1;
-let coins = 0;
-let activePowerUp = null;
-let enemyDragonInterval;
-
-instructionsButton.addEventListener('click', () => {
-    startScreen.classList.add('hidden');
-    instructionsScreen.classList.remove('hidden');
-});
-
-backButton.addEventListener('click', () => {
-    instructionsScreen.classList.add('hidden');
-    startScreen.classList.remove('hidden');
-});
 
 function createEnemyDragon() {
     const enemyDragon = document.createElement('div');
@@ -239,7 +151,8 @@ function createCoin() {
 }
 
 function checkCollision(element, type) {
-    // ... (existing collision code)
+    const dragonRect = dragon.getBoundingClientRect();
+    const elementRect = element.getBoundingClientRect();
 
     if (
         dragonRect.left < elementRect.right &&
@@ -265,7 +178,7 @@ function checkCollision(element, type) {
                 }
                 break;
             case 'power-up':
-                activatePowerUp();
+                activatePowerUp(element.dataset.type);
                 gameScreen.removeChild(element);
                 break;
             case 'enemy-dragon':
@@ -288,34 +201,6 @@ function checkCollision(element, type) {
     }
 }
 
-function activatePowerUp() {
-    const powerUps = ['shield', 'speed', 'magnet'];
-    activePowerUp = powerUps[Math.floor(Math.random() * powerUps.length)];
-    isInvincible = true;
-    dragon.style.filter = 'brightness(1.5) hue-rotate(90deg)';
-    powerUpIndicator.textContent = `Power-up: ${activePowerUp}`;
-    
-    switch (activePowerUp) {
-        case 'shield':
-            // Shield logic (already implemented with isInvincible)
-            break;
-        case 'speed':
-            dragon.style.transition = 'all 0.05s ease';
-            break;
-        case 'magnet':
-            // Magnet logic will be implemented in the game loop
-            break;
-    }
-
-    setTimeout(() => {
-        isInvincible = false;
-        dragon.style.filter = 'none';
-        dragon.style.transition = 'all 0.1s ease';
-        activePowerUp = null;
-        powerUpIndicator.textContent = '';
-    }, 10000);
-}
-
 function createExplosion(x, y) {
     const explosion = document.createElement('div');
     explosion.classList.add('explosion');
@@ -332,224 +217,10 @@ function updateScore() {
     scoreElement.textContent = `Score: ${score} | Coins: ${coins}`;
 }
 
-function levelUp() {
-    level++;
-    const levelIndicator = document.createElement('div');
-    levelIndicator.id = 'level-indicator';
-    levelIndicator.textContent = `Level ${level}`;
-    gameScreen.appendChild(levelIndicator);
-
-    setTimeout(() => {
-        gameScreen.removeChild(levelIndicator);
-    }, 2000);
-
-    // Increase game difficulty
-    clearInterval(fireballInterval);
-    clearInterval(obstacleInterval);
-    clearInterval(powerUpInterval);
-    clearInterval(enemyDragonInterval);
-
-    fireballInterval = setInterval(createFireball, 2000 - level * 100);
-    obstacleInterval = setInterval(createObstacle, 3000 - level * 150);
-    powerUpInterval = setInterval(createPowerUp, 10000 - level * 500);
-    enemyDragonInterval = setInterval(createEnemyDragon, 5000 - level * 200);
+function updateHealthBar() {
+    healthFill.style.width = `${health}%`;
 }
 
-function gameLoop() {
-    dragonX += 1;
-    if (dragonX > 750) {
-        gameOver();
-    }
-
-    if (activePowerUp === 'magnet') {
-        const items = document.querySelectorAll('.fireball, .coin');
-        items.forEach(item => {
-            const itemRect = item.getBoundingClientRect();
-            const dragonRect = dragon.getBoundingClientRect();
-            const dx = (dragonRect.left + dragonRect.width / 2) - (itemRect.left + itemRect.width / 2);
-            const dy = (dragonRect.top + dragonRect.height / 2) - (itemRect.top + itemRect.height / 2);
-            const distance = Math.sqrt(dx * dx + dy * dy);
-
-            if (distance < 150) {
-                item.style.left = `${parseInt(item.style.left) + dx / 10}px`;
-                item.style.top = `${parseInt(item.style.top) + dy / 10}px`;
-            }
-        });
-    }
-
-    if (score > 0 && score % 100 === 0) {
-        levelUp();
-    }
-
-    updateDragonPosition();
-    requestAnimationFrame(gameLoop);
-}
-
-function startGame() {
-    // ... (existing startGame code)
-
-    enemyDragonInterval = setInterval(createEnemyDragon, 5000);
-    setInterval(createCoin, 4000);
-
-    requestAnimationFrame(gameLoop);
-}
-const highScoresButton = document.getElementById('high-scores-button');
-const highScoresScreen = document.getElementById('high-scores-screen');
-const backFromScoresButton = document.getElementById('back-from-scores-button');
-const highScoresList = document.getElementById('high-scores-list');
-const pauseScreen = document.getElementById('pause-screen');
-const resumeButton = document.getElementById('resume-button');
-const quitButton = document.getElementById('quit-button');
-const playerNameInput = document.getElementById('player-name');
-const submitScoreButton = document.getElementById('submit-score');
-const missionIndicator = document.getElementById('mission-indicator');
-const levelIndicator = document.getElementById('level-indicator');
-
-let highScores = [];
-let currentMission = null;
-let isPaused = false;
-
-highScoresButton.addEventListener('click', showHighScores);
-backFromScoresButton.addEventListener('click', () => {
-    highScoresScreen.classList.add('hidden');
-    startScreen.classList.remove('hidden');
-});
-
-resumeButton.addEventListener('click', resumeGame);
-quitButton.addEventListener('click', quitToMenu);
-submitScoreButton.addEventListener('click', submitScore);
-
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && !startScreen.classList.contains('hidden')) {
-        togglePause();
-    }
-});
-
-function showHighScores() {
-    startScreen.classList.add('hidden');
-    highScoresScreen.classList.remove('hidden');
-    displayHighScores();
-}
-
-function displayHighScores() {
-    highScoresList.innerHTML = '';
-    highScores.sort((a, b) => b.score - a.score);
-    highScores.slice(0, 10).forEach((score, index) => {
-        const li = document.createElement('li');
-        li.textContent = `${index + 1}. ${score.name}: ${score.score}`;
-        highScoresList.appendChild(li);
-    });
-}
-
-function togglePause() {
-    isPaused = !isPaused;
-    if (isPaused) {
-        pauseScreen.classList.remove('hidden');
-        cancelAnimationFrame(gameLoop);
-    } else {
-        pauseScreen.classList.add('hidden');
-        requestAnimationFrame(gameLoop);
-    }
-}
-
-function resumeGame() {
-    togglePause();
-}
-
-function quitToMenu() {
-    isPaused = false;
-    pauseScreen.classList.add('hidden');
-    gameScreen.classList.add('hidden');
-    startScreen.classList.remove('hidden');
-    resetGame();
-}
-
-function submitScore() {
-    const playerName = playerNameInput.value.trim();
-    if (playerName) {
-        highScores.push({ name: playerName, score: score });
-        highScores.sort((a, b) => b.score - a.score);
-        highScores = highScores.slice(0, 10);
-        localStorage.setItem('highScores', JSON.stringify(highScores));
-        showHighScores();
-    }
-}
-
-function loadHighScores() {
-    const savedScores = localStorage.getItem('highScores');
-    if (savedScores) {
-        highScores = JSON.parse(savedScores);
-    }
-}
-
-function generateMission() {
-    const missionTypes = [
-        { type: 'score', target: 50 * level, description: 'Reach {target} points' },
-        { type: 'coins', target: 10 * level, description: 'Collect {target} coins' },
-        { type: 'survive', target: 30 * level, description: 'Survive for {target} seconds' }
-    ];
-
-    const randomMission = missionTypes[Math.floor(Math.random() * missionTypes.length)];
-    currentMission = {
-        ...randomMission,
-        progress: 0,
-        description: randomMission.description.replace('{target}', randomMission.target)
-    };
-
-    updateMissionIndicator();
-}
-
-function updateMissionIndicator() {
-    missionIndicator.textContent = `Mission: ${currentMission.description} (${currentMission.progress}/${currentMission.target})`;
-}
-
-function updateMissionProgress() {
-    switch (currentMission.type) {
-        case 'score':
-            currentMission.progress = score;
-            break;
-        case 'coins':
-            currentMission.progress = coins;
-            break;
-        case 'survive':
-            currentMission.progress = Math.floor((Date.now() - gameStartTime) / 1000);
-            break;
-    }
-
-    if (currentMission.progress >= currentMission.target) {
-        completeMission();
-    }
-
-    updateMissionIndicator();
-}
-
-function completeMission() {
-    score += 100 * level;
-    updateScore();
-    generateMission();
-}
-
-function createPowerUp() {
-    const powerUpTypes = ['shield', 'speed', 'magnet', 'multi-shot', 'health'];
-    const type = powerUpTypes[Math.floor(Math.random() * powerUpTypes.length)];
-    const powerUp = document.createElement('div');
-    powerUp.classList.add('power-up');
-    powerUp.dataset.type = type;
-    powerUp.style.left = '800px';
-    powerUp.style.top = Math.random() * 370 + 'px';
-    gameScreen.appendChild(powerUp);
-
-    const powerUpLoop = setInterval(() => {
-        const left = parseInt(powerUp.style.left);
-        if (left > -30) {
-            powerUp.style.left = (left - 2) + 'px';
-            checkCollision(powerUp, 'power-up');
-        } else {
-            clearInterval(powerUpLoop);
-            gameScreen.removeChild(powerUp);
-        }
-    }, 50);
-}
 function activatePowerUp(type) {
     isInvincible = true;
     dragon.style.filter = 'brightness(1.5) hue-rotate(90deg)';
@@ -603,237 +274,217 @@ function activateMultiShot() {
 
 function deactivateMultiShot() {
     clearInterval(fireballInterval);
-    fireballInterval = setInterval(createFireball, 2000 - level * 100);
+    fireballInterval = setInterval(() => {
+        createFireball();
+    }, 1000);
 }
 
-function createFireball(angle = 0) {
-    const fireball = document.createElement('div');
-    fireball.classList.add('fireball');
-    fireball.style.left = `${dragonX + 60}px`;
-    fireball.style.top = `${dragonY + 20}px`;
-    gameScreen.appendChild(fireball);
-
-    const fireballLoop = setInterval(() => {
-        const left = parseInt(fireball.style.left);
-        const top = parseInt(fireball.style.top);
-        if (left < 800 && top > 0 && top < 400) {
-            fireball.style.left = (left + 5 * Math.cos(angle * Math.PI / 180)) + 'px';
-            fireball.style.top = (top + 5 * Math.sin(angle * Math.PI / 180)) + 'px';
-            checkCollision(fireball, 'fireball');
-        } else {
-            clearInterval(fireballLoop);
-            gameScreen.removeChild(fireball);
-        }
-    }, 50);
+function loadHighScores() {
+    const storedScores = localStorage.getItem('highScores');
+    if (storedScores) {
+        highScores = JSON.parse(storedScores);
+    }
 }
 
-function updateScore() {
-    scoreElement.textContent = `Score: ${score}`;
-    coinsElement.textContent = `Coins: ${coins}`;
+function saveHighScores() {
+    localStorage.setItem('highScores', JSON.stringify(highScores));
 }
 
-function updateHealthBar() {
-    healthFill.style.width = `${health}%`;
+function displayHighScores() {
+    highScoresList.innerHTML = '';
+    highScores.forEach((score, index) => {
+        const listItem = document.createElement('li');
+        listItem.textContent = `${index + 1}. ${score.name} - ${score.score}`;
+        highScoresList.appendChild(listItem);
+    });
 }
 
-function levelUp() {
-    level++;
-    levelIndicator.textContent = `Level: ${level}`;
-    
-    // Increase game difficulty
+function updateMission() {
+    // Define mission types and conditions
+    const missions = [
+        { description: "Collect 10 coins", condition: () => coins >= 10 },
+        { description: "Reach a score of 100", condition: () => score >= 100 },
+        { description: "Survive for 1 minute", condition: () => (new Date().getTime() - gameStartTime) >= 60000 }
+    ];
+
+    // If there's no current mission or it is completed, assign a new mission
+    if (!currentMission || currentMission.condition()) {
+        currentMission = missions[Math.floor(Math.random() * missions.length)];
+    }
+
+    missionIndicator.textContent = `Mission: ${currentMission.description}`;
+}
+
+function gameOver() {
+    clearInterval(gameLoop);
     clearInterval(obstacleInterval);
     clearInterval(powerUpInterval);
     clearInterval(enemyDragonInterval);
     clearInterval(coinInterval);
+    clearInterval(fireballInterval);
 
-    obstacleInterval = setInterval(createObstacle, 3000 - level * 150);
-    powerUpInterval = setInterval(createPowerUp, 10000 - level * 500);
-    enemyDragonInterval = setInterval(createEnemyDragon, 5000 - level * 200);
-    coinInterval = setInterval(createCoin, 4000 - level * 100);
-
-    // Add a boss every 5 levels
-    if (level % 5 === 0) {
-        createBoss();
-    }
-}
-
-function createBoss() {
-    const boss = document.createElement('div');
-    boss.classList.add('boss');
-    boss.style.left = '800px';
-    boss.style.top = '150px';
-    boss.style.width = '100px';
-    boss.style.height = '100px';
-    boss.style.backgroundImage = 'url("https://example.com/boss.png")';
-    boss.style.backgroundSize = 'contain';
-    boss.style.backgroundRepeat = 'no-repeat';
-    gameScreen.appendChild(boss);
-
-    let bossHealth = 100 * level;
-    let bossDirection = 1;
-
-    const bossLoop = setInterval(() => {
-        const left = parseInt(boss.style.left);
-        const top = parseInt(boss.style.top);
-
-        if (left > 600) {
-            boss.style.left = (left - 1) + 'px';
-        } else {
-            boss.style.top = (top + bossDirection * 2) + 'px';
-            if (top <= 0 || top >= 300) {
-                bossDirection *= -1;
-            }
-
-            if (Math.random() < 0.05) {
-                createBossProjectile(left, top);
-            }
-        }
-
-        checkBossCollision(boss);
-    }, 50);
-
-    function checkBossCollision(boss) {
-        const bossRect = boss.getBoundingClientRect();
-        const dragonRect = dragon.getBoundingClientRect();
-
-        if (
-            dragonRect.left < bossRect.right &&
-            dragonRect.right > bossRect.left &&
-            dragonRect.top < bossRect.bottom &&
-            dragonRect.bottom > bossRect.top
-        ) {
-            health -= 5;
-            updateHealthBar();
-            if (health <= 0) {
-                gameOver();
-            }
-        }
-
-        const fireballs = document.querySelectorAll('.fireball');
-        fireballs.forEach(fireball => {
-            const fireballRect = fireball.getBoundingClientRect();
-            if (
-                fireballRect.left < bossRect.right &&
-                fireballRect.right > bossRect.left &&
-                fireballRect.top < bossRect.bottom &&
-                fireballRect.bottom > bossRect.top
-            ) {
-                bossHealth -= 10;
-                gameScreen.removeChild(fireball);
-                if (bossHealth <= 0) {
-                    defeatBoss(boss, bossLoop);
-                }
-            }
-        });
-    }
-}
-
-function createBossProjectile(bossLeft, bossTop) {
-    const projectile = document.createElement('div');
-    projectile.classList.add('boss-projectile');
-    projectile.style.left = `${bossLeft}px`;
-    projectile.style.top = `${bossTop + 50}px`;
-    gameScreen.appendChild(projectile);
-
-    const projectileLoop = setInterval(() => {
-        const left = parseInt(projectile.style.left);
-        if (left > -20) {
-            projectile.style.left = (left - 5) + 'px';
-            checkCollision(projectile, 'boss-projectile');
-        } else {
-            clearInterval(projectileLoop);
-            gameScreen.removeChild(projectile);
-        }
-    }, 50);
-}
-
-function defeatBoss(boss, bossLoop) {
-    clearInterval(bossLoop);
-    gameScreen.removeChild(boss);
-    score += 1000 * level;
-    updateScore();
-    createExplosion(parseInt(boss.style.left), parseInt(boss.style.top));
-}
-
-function gameLoop() {
-    if (!isPaused) {
-        dragonX += 1;
-        if (dragonX > 750) {
-            gameOver();
-        }
-
-        if (activePowerUp === 'magnet') {
-            const items = document.querySelectorAll('.fireball, .coin');
-            items.forEach(item => {
-                const itemRect = item.getBoundingClientRect();
-                const dragonRect = dragon.getBoundingClientRect();
-                const dx = (dragonRect.left + dragonRect.width / 2) - (itemRect.left + itemRect.width / 2);
-                const dy = (dragonRect.top + dragonRect.height / 2) - (itemRect.top + itemRect.height / 2);
-                const distance = Math.sqrt(dx * dx + dy * dy);
-
-                if (distance < 150) {
-                    item.style.left = `${parseInt(item.style.left) + dx / 10}px`;
-                    item.style.top = `${parseInt(item.style.top) + dy / 10}px`;
-                }
-            });
-        }
-
-        updateMissionProgress();
-
-        if (score > 0 && score % 1000 === 0) {
-            levelUp();
-        }
-
-        updateDragonPosition();
-    }
-    requestAnimationFrame(gameLoop);
+    finalScoreElement.textContent = `Final Score: ${score}`;
+    gameScreen.style.display = 'none';
+    gameOverScreen.style.display = 'flex';
 }
 
 function startGame() {
-    dragonX = 0;
-    dragonY = 200;
     score = 0;
-    coins = 0;
     health = 100;
     level = 1;
+    coins = 0;
+    isPaused = false;
+    gameStartTime = new Date().getTime();
+
     updateScore();
     updateHealthBar();
-    levelIndicator.textContent = `Level: ${level}`;
-    updateDragonPosition();
+    updateMission();
 
-    startScreen.classList.add('hidden');
-    gameScreen.classList.remove('hidden');
-    gameOverScreen.classList.add('hidden');
+    gameScreen.style.display = 'block';
+    gameOverScreen.style.display = 'none';
+    startScreen.style.display = 'none';
+    instructionsScreen.style.display = 'none';
+    highScoresScreen.style.display = 'none';
+    pauseScreen.style.display = 'none';
 
-    generateMission();
-    gameStartTime = Date.now();
+    gameLoop = setInterval(() => {
+        updateDragonPosition();
+        updateMission();
+    }, 50);
 
-    fireballInterval = setInterval(createFireball, 2000);
-    obstacleInterval = setInterval(createObstacle, 3000);
-    powerUpInterval = setInterval(createPowerUp, 10000);
-    enemyDragonInterval = setInterval(createEnemyDragon, 5000);
-    coinInterval = setInterval(createCoin, 4000);
+    fireballInterval = setInterval(() => {
+        createFireball();
+    }, 1000);
 
-    requestAnimationFrame(gameLoop);
+    obstacleInterval = setInterval(() => {
+        createObstacle();
+    }, 2000);
+
+    powerUpInterval = setInterval(() => {
+        createPowerUp();
+    }, 10000);
+
+    enemyDragonInterval = setInterval(() => {
+        createEnemyDragon();
+    }, 15000);
+
+    coinInterval = setInterval(() => {
+        createCoin();
+    }, 5000);
 }
 
-function resetGame() {
-    const elements = document.querySelectorAll('.fireball, .obstacle, .power-up, .enemy-dragon, .coin, .boss, .boss-projectile');
-    elements.forEach(element => gameScreen.removeChild(element));
+function pauseGame() {
+    if (isPaused) {
+        gameLoop = setInterval(() => {
+            updateDragonPosition();
+            updateMission();
+        }, 50);
+        fireballInterval = setInterval(() => {
+            createFireball();
+        }, 1000);
+        obstacleInterval = setInterval(() => {
+            createObstacle();
+        }, 2000);
+        powerUpInterval = setInterval(() => {
+            createPowerUp();
+        }, 10000);
+        enemyDragonInterval = setInterval(() => {
+            createEnemyDragon();
+        }, 15000);
+        coinInterval = setInterval(() => {
+            createCoin();
+        }, 5000);
+        pauseScreen.style.display = 'none';
+    } else {
+        clearInterval(gameLoop);
+        clearInterval(fireballInterval);
+        clearInterval(obstacleInterval);
+        clearInterval(powerUpInterval);
+        clearInterval(enemyDragonInterval);
+        clearInterval(coinInterval);
+        pauseScreen.style.display = 'flex';
+    }
+    isPaused = !isPaused;
+}
 
+function quitGame() {
+    clearInterval(gameLoop);
     clearInterval(fireballInterval);
     clearInterval(obstacleInterval);
     clearInterval(powerUpInterval);
     clearInterval(enemyDragonInterval);
     clearInterval(coinInterval);
+
+    gameScreen.style.display = 'none';
+    gameOverScreen.style.display = 'none';
+    startScreen.style.display = 'flex';
+    pauseScreen.style.display = 'none';
 }
 
-function gameOver() {
-    cancelAnimationFrame(gameLoop);
-    resetGame();
-    gameScreen.classList.add('hidden');
-    gameOverScreen.classList.remove('hidden');
-    finalScoreElement.textContent = `Final Score: ${score}`;
-}
+startButton.addEventListener('click', startGame);
+restartButton.addEventListener('click', startGame);
+instructionsButton.addEventListener('click', () => {
+    startScreen.style.display = 'none';
+    instructionsScreen.style.display = 'flex';
+});
+backButton.addEventListener('click', () => {
+    instructionsScreen.style.display = 'none';
+    startScreen.style.display = 'flex';
+});
+highScoresButton.addEventListener('click', () => {
+    loadHighScores();
+    displayHighScores();
+    startScreen.style.display = 'none';
+    highScoresScreen.style.display = 'flex';
+});
+backFromScoresButton.addEventListener('click', () => {
+    highScoresScreen.style.display = 'none';
+    startScreen.style.display = 'flex';
+});
+resumeButton.addEventListener('click', pauseGame);
+quitButton.addEventListener('click', quitGame);
+submitScoreButton.addEventListener('click', () => {
+    const playerName = playerNameInput.value.trim();
+    if (playerName) {
+        highScores.push({ name: playerName, score });
+        highScores.sort((a, b) => b.score - a.score);
+        if (highScores.length > 10) {
+            highScores.pop();
+        }
+        saveHighScores();
+        playerNameInput.value = '';
+        gameOverScreen.style.display = 'none';
+        highScoresScreen.style.display = 'flex';
+        displayHighScores();
+    }
+});
 
-loadHighScores();
+document.addEventListener('keydown', (event) => {
+    switch (event.key) {
+        case 'ArrowUp':
+            dragonY = Math.max(dragonY - 20, 0);
+            break;
+        case 'ArrowDown':
+            dragonY = Math.min(dragonY + 20, 380);
+            break;
+        case 'ArrowLeft':
+            dragonX = Math.max(dragonX - 20, 0);
+            break;
+        case 'ArrowRight':
+            dragonX = Math.min(dragonX + 20, 740);
+            break;
+        case ' ':
+            createFireball();
+            break;
+        case 'p':
+            pauseGame();
+            break;
+        case 'q':
+            quitGame();
+            break;
+    }
+});
+
+window.addEventListener('load', () => {
+    loadHighScores();
+});
