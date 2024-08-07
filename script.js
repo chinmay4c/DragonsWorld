@@ -288,3 +288,110 @@ function checkCollision(element, type) {
     }
 }
 
+function activatePowerUp() {
+    const powerUps = ['shield', 'speed', 'magnet'];
+    activePowerUp = powerUps[Math.floor(Math.random() * powerUps.length)];
+    isInvincible = true;
+    dragon.style.filter = 'brightness(1.5) hue-rotate(90deg)';
+    powerUpIndicator.textContent = `Power-up: ${activePowerUp}`;
+    
+    switch (activePowerUp) {
+        case 'shield':
+            // Shield logic (already implemented with isInvincible)
+            break;
+        case 'speed':
+            dragon.style.transition = 'all 0.05s ease';
+            break;
+        case 'magnet':
+            // Magnet logic will be implemented in the game loop
+            break;
+    }
+
+    setTimeout(() => {
+        isInvincible = false;
+        dragon.style.filter = 'none';
+        dragon.style.transition = 'all 0.1s ease';
+        activePowerUp = null;
+        powerUpIndicator.textContent = '';
+    }, 10000);
+}
+
+function createExplosion(x, y) {
+    const explosion = document.createElement('div');
+    explosion.classList.add('explosion');
+    explosion.style.left = `${x}px`;
+    explosion.style.top = `${y}px`;
+    gameScreen.appendChild(explosion);
+
+    setTimeout(() => {
+        gameScreen.removeChild(explosion);
+    }, 500);
+}
+
+function updateScore() {
+    scoreElement.textContent = `Score: ${score} | Coins: ${coins}`;
+}
+
+function levelUp() {
+    level++;
+    const levelIndicator = document.createElement('div');
+    levelIndicator.id = 'level-indicator';
+    levelIndicator.textContent = `Level ${level}`;
+    gameScreen.appendChild(levelIndicator);
+
+    setTimeout(() => {
+        gameScreen.removeChild(levelIndicator);
+    }, 2000);
+
+    // Increase game difficulty
+    clearInterval(fireballInterval);
+    clearInterval(obstacleInterval);
+    clearInterval(powerUpInterval);
+    clearInterval(enemyDragonInterval);
+
+    fireballInterval = setInterval(createFireball, 2000 - level * 100);
+    obstacleInterval = setInterval(createObstacle, 3000 - level * 150);
+    powerUpInterval = setInterval(createPowerUp, 10000 - level * 500);
+    enemyDragonInterval = setInterval(createEnemyDragon, 5000 - level * 200);
+}
+
+function gameLoop() {
+    dragonX += 1;
+    if (dragonX > 750) {
+        gameOver();
+    }
+
+    if (activePowerUp === 'magnet') {
+        const items = document.querySelectorAll('.fireball, .coin');
+        items.forEach(item => {
+            const itemRect = item.getBoundingClientRect();
+            const dragonRect = dragon.getBoundingClientRect();
+            const dx = (dragonRect.left + dragonRect.width / 2) - (itemRect.left + itemRect.width / 2);
+            const dy = (dragonRect.top + dragonRect.height / 2) - (itemRect.top + itemRect.height / 2);
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            if (distance < 150) {
+                item.style.left = `${parseInt(item.style.left) + dx / 10}px`;
+                item.style.top = `${parseInt(item.style.top) + dy / 10}px`;
+            }
+        });
+    }
+
+    if (score > 0 && score % 100 === 0) {
+        levelUp();
+    }
+
+    updateDragonPosition();
+    requestAnimationFrame(gameLoop);
+}
+
+function startGame() {
+    // ... (existing startGame code)
+
+    enemyDragonInterval = setInterval(createEnemyDragon, 5000);
+    setInterval(createCoin, 4000);
+
+    requestAnimationFrame(gameLoop);
+}
+
+// ... (existing event listeners and game initialization)
