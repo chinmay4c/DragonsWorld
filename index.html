@@ -4,112 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dragon World Game</title>
-    <style>
-        #game-container {
-            width: 800px;
-            height: 400px;
-            border: 2px solid black;
-            position: relative;
-            overflow: hidden;
-            background-color: skyblue;
-        }
-        #dragon {
-            width: 50px;
-            height: 50px;
-            position: absolute;
-            background-color: green;
-            border-radius: 50%;
-        }
-        .fireball {
-            width: 20px;
-            height: 20px;
-            position: absolute;
-            background-color: red;
-            border-radius: 50%;
-        }
-        #score {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            font-size: 24px;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div id="game-container">
         <div id="dragon"></div>
         <div id="score">Score: 0</div>
     </div>
-
-    <script>
-        const dragon = document.getElementById('dragon');
-        const gameContainer = document.getElementById('game-container');
-        const scoreElement = document.getElementById('score');
-
-        let dragonX = 0;
-        let dragonY = 200;
-        let score = 0;
-
-        function updateDragonPosition() {
-            dragon.style.left = dragonX + 'px';
-            dragon.style.top = dragonY + 'px';
-        }
-
-        function createFireball() {
-            const fireball = document.createElement('div');
-            fireball.classList.add('fireball');
-            fireball.style.left = '800px';
-            fireball.style.top = Math.random() * 380 + 'px';
-            gameContainer.appendChild(fireball);
-
-            const fireballInterval = setInterval(() => {
-                const left = parseInt(fireball.style.left);
-                if (left > -20) {
-                    fireball.style.left = (left - 5) + 'px';
-                    checkCollision(fireball);
-                } else {
-                    clearInterval(fireballInterval);
-                    gameContainer.removeChild(fireball);
-                }
-            }, 50);
-        }
-
-        function checkCollision(fireball) {
-            const dragonRect = dragon.getBoundingClientRect();
-            const fireballRect = fireball.getBoundingClientRect();
-
-            if (
-                dragonRect.left < fireballRect.right &&
-                dragonRect.right > fireballRect.left &&
-                dragonRect.top < fireballRect.bottom &&
-                dragonRect.bottom > fireballRect.top
-            ) {
-                score++;
-                scoreElement.textContent = `Score: ${score}`;
-                gameContainer.removeChild(fireball);
-            }
-        }
-
-        document.addEventListener('keydown', (e) => {
-            switch (e.key) {
-                case 'ArrowUp':
-                    if (dragonY > 0) dragonY -= 10;
-                    break;
-                case 'ArrowDown':
-                    if (dragonY < 350) dragonY += 10;
-                    break;
-                case 'ArrowLeft':
-                    if (dragonX > 0) dragonX -= 10;
-                    break;
-                case 'ArrowRight':
-                    if (dragonX < 750) dragonX += 10;
-                    break;
-            }
-            updateDragonPosition();
-        });
-
-        setInterval(createFireball, 2000);
-        updateDragonPosition();
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
