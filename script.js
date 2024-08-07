@@ -600,3 +600,94 @@ function activateMultiShot() {
         createFireball(30);
     }, 1000);
 }
+
+function deactivateMultiShot() {
+    clearInterval(fireballInterval);
+    fireballInterval = setInterval(createFireball, 2000 - level * 100);
+}
+
+function createFireball(angle = 0) {
+    const fireball = document.createElement('div');
+    fireball.classList.add('fireball');
+    fireball.style.left = `${dragonX + 60}px`;
+    fireball.style.top = `${dragonY + 20}px`;
+    gameScreen.appendChild(fireball);
+
+    const fireballLoop = setInterval(() => {
+        const left = parseInt(fireball.style.left);
+        const top = parseInt(fireball.style.top);
+        if (left < 800 && top > 0 && top < 400) {
+            fireball.style.left = (left + 5 * Math.cos(angle * Math.PI / 180)) + 'px';
+            fireball.style.top = (top + 5 * Math.sin(angle * Math.PI / 180)) + 'px';
+            checkCollision(fireball, 'fireball');
+        } else {
+            clearInterval(fireballLoop);
+            gameScreen.removeChild(fireball);
+        }
+    }, 50);
+}
+
+function updateScore() {
+    scoreElement.textContent = `Score: ${score}`;
+    coinsElement.textContent = `Coins: ${coins}`;
+}
+
+function updateHealthBar() {
+    healthFill.style.width = `${health}%`;
+}
+
+function levelUp() {
+    level++;
+    levelIndicator.textContent = `Level: ${level}`;
+    
+    // Increase game difficulty
+    clearInterval(obstacleInterval);
+    clearInterval(powerUpInterval);
+    clearInterval(enemyDragonInterval);
+    clearInterval(coinInterval);
+
+    obstacleInterval = setInterval(createObstacle, 3000 - level * 150);
+    powerUpInterval = setInterval(createPowerUp, 10000 - level * 500);
+    enemyDragonInterval = setInterval(createEnemyDragon, 5000 - level * 200);
+    coinInterval = setInterval(createCoin, 4000 - level * 100);
+
+    // Add a boss every 5 levels
+    if (level % 5 === 0) {
+        createBoss();
+    }
+}
+
+function createBoss() {
+    const boss = document.createElement('div');
+    boss.classList.add('boss');
+    boss.style.left = '800px';
+    boss.style.top = '150px';
+    boss.style.width = '100px';
+    boss.style.height = '100px';
+    boss.style.backgroundImage = 'url("https://example.com/boss.png")';
+    boss.style.backgroundSize = 'contain';
+    boss.style.backgroundRepeat = 'no-repeat';
+    gameScreen.appendChild(boss);
+
+    let bossHealth = 100 * level;
+    let bossDirection = 1;
+
+    const bossLoop = setInterval(() => {
+        const left = parseInt(boss.style.left);
+        const top = parseInt(boss.style.top);
+
+        if (left > 600) {
+            boss.style.left = (left - 1) + 'px';
+        } else {
+            boss.style.top = (top + bossDirection * 2) + 'px';
+            if (top <= 0 || top >= 300) {
+                bossDirection *= -1;
+            }
+
+            if (Math.random() < 0.05) {
+                createBossProjectile(left, top);
+            }
+        }
+
+        checkBossCollision(boss);
+    }, 50);
