@@ -502,3 +502,101 @@ function generateMission() {
 function updateMissionIndicator() {
     missionIndicator.textContent = `Mission: ${currentMission.description} (${currentMission.progress}/${currentMission.target})`;
 }
+
+function updateMissionProgress() {
+    switch (currentMission.type) {
+        case 'score':
+            currentMission.progress = score;
+            break;
+        case 'coins':
+            currentMission.progress = coins;
+            break;
+        case 'survive':
+            currentMission.progress = Math.floor((Date.now() - gameStartTime) / 1000);
+            break;
+    }
+
+    if (currentMission.progress >= currentMission.target) {
+        completeMission();
+    }
+
+    updateMissionIndicator();
+}
+
+function completeMission() {
+    score += 100 * level;
+    updateScore();
+    generateMission();
+}
+
+function createPowerUp() {
+    const powerUpTypes = ['shield', 'speed', 'magnet', 'multi-shot', 'health'];
+    const type = powerUpTypes[Math.floor(Math.random() * powerUpTypes.length)];
+    const powerUp = document.createElement('div');
+    powerUp.classList.add('power-up');
+    powerUp.dataset.type = type;
+    powerUp.style.left = '800px';
+    powerUp.style.top = Math.random() * 370 + 'px';
+    gameScreen.appendChild(powerUp);
+
+    const powerUpLoop = setInterval(() => {
+        const left = parseInt(powerUp.style.left);
+        if (left > -30) {
+            powerUp.style.left = (left - 2) + 'px';
+            checkCollision(powerUp, 'power-up');
+        } else {
+            clearInterval(powerUpLoop);
+            gameScreen.removeChild(powerUp);
+        }
+    }, 50);
+}
+function activatePowerUp(type) {
+    isInvincible = true;
+    dragon.style.filter = 'brightness(1.5) hue-rotate(90deg)';
+    powerUpIndicator.textContent = `Power-up: ${type}`;
+    
+    switch (type) {
+        case 'shield':
+            // Shield logic (already implemented with isInvincible)
+            break;
+        case 'speed':
+            dragon.style.transition = 'all 0.05s ease';
+            break;
+        case 'magnet':
+            // Magnet logic will be implemented in the game loop
+            break;
+        case 'multi-shot':
+            activateMultiShot();
+            break;
+        case 'health':
+            health = Math.min(health + 30, 100);
+            updateHealthBar();
+            break;
+    }
+
+    setTimeout(() => {
+        deactivatePowerUp(type);
+    }, 10000);
+}
+
+function deactivatePowerUp(type) {
+    isInvincible = false;
+    dragon.style.filter = 'none';
+    dragon.style.transition = 'all 0.1s ease';
+    powerUpIndicator.textContent = '';
+
+    switch (type) {
+        case 'multi-shot':
+            deactivateMultiShot();
+            break;
+    }
+}
+
+function activateMultiShot() {
+    clearInterval(fireballInterval);
+    fireballInterval = setInterval(() => {
+        createFireball(0);
+        createFireball(-30);
+        createFireball(30);
+    }, 1000);
+}
