@@ -1,9 +1,14 @@
-body {
+/* General Reset */
+* {
     margin: 0;
     padding: 0;
-    font-family: Arial, sans-serif;
-    background-color: #282c34;
-    color: #ffffff;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Press Start 2P', Arial, sans-serif;
+    background-color: #1b262c;
+    color: #bbe1fa;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -11,171 +16,81 @@ body {
     overflow: hidden;
 }
 
+/* Game Container */
 #game-container {
     position: relative;
     width: 800px;
-    height: 400px;
-    border: 2px solid #ffffff;
-    background: linear-gradient(to bottom, #87ceeb, #1e90ff);
+    height: 600px;
+    border: 3px solid #0f4c75;
+    background: linear-gradient(to bottom, #3282b8, #0f4c75);
     overflow: hidden;
+    border-radius: 20px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+    animation: fadeIn 1.5s ease-in-out;
+}
+
+/* Dragon and Game Elements */
+#dragon, .fireball, .obstacle, .power-up, .enemy-dragon, .coin, .explosion {
+    position: absolute;
 }
 
 #dragon {
-    position: absolute;
-    width: 60px;
-    height: 40px;
+    width: 80px;
+    height: 60px;
     background: url('dragon.png') no-repeat center center / contain;
     transition: top 0.1s, left 0.1s;
 }
 
 .fireball {
-    position: absolute;
-    width: 20px;
-    height: 20px;
+    width: 25px;
+    height: 25px;
     background: url('fireball.png') no-repeat center center / contain;
-    transition: left 0.05s, top 0.05s;
+    animation: spin 1s linear infinite;
 }
 
 .obstacle {
-    position: absolute;
     width: 50px;
     height: 50px;
     background: url('obstacle.png') no-repeat center center / contain;
 }
 
 .power-up {
-    position: absolute;
-    width: 30px;
-    height: 30px;
+    width: 35px;
+    height: 35px;
     background: url('power-up.png') no-repeat center center / contain;
+    animation: pulse 1.5s infinite;
 }
 
 .enemy-dragon {
-    position: absolute;
-    width: 60px;
-    height: 40px;
+    width: 70px;
+    height: 50px;
     background: url('enemy-dragon.png') no-repeat center center / contain;
 }
 
 .coin {
-    position: absolute;
-    width: 20px;* {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        font-family: 'Arial', sans-serif;
-    }
-    
-    body {
-        background: linear-gradient(to bottom, #141E30, #243B55);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        color: #ffffff;
-    }
-    
-    h1 {
-        font-size: 3rem;
-        margin-bottom: 1rem;
-        text-align: center;
-        animation: fadeIn 2s ease-in-out;
-    }
-    
-    .container {
-        background: rgba(0, 0, 0, 0.8);
-        padding: 20px;
-        border-radius: 15px;
-        box-shadow: 0 0 15px rgba(0, 0, 0, 0.6);
-        text-align: center;
-        max-width: 600px;
-        width: 100%;
-        animation: slideIn 1s ease-in-out;
-    }
-    
-    .container p {
-        font-size: 1.2rem;
-        line-height: 1.5;
-        margin-bottom: 1.5rem;
-    }
-    
-    .dragon-container {
-        display: flex;
-        justify-content: center;
-        margin-top: 20px;
-    }
-    
-    .dragon {
-        width: 200px;
-        height: 200px;
-        background: url('dragon.png') no-repeat center center/contain;
-        animation: float 3s ease-in-out infinite;
-    }
-    
-    .button-container {
-        margin-top: 1rem;
-    }
-    
-    button {
-        padding: 10px 20px;
-        font-size: 1rem;
-        font-weight: bold;
-        color: #ffffff;
-        background: #FF4B2B;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
-    }
-    
-    button:hover {
-        background: #FF416C;
-        transform: scale(1.1);
-    }
-    
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-        }
-        to {
-            opacity: 1;
-        }
-    }
-    
-    @keyframes slideIn {
-        from {
-            transform: translateY(-100%);
-        }
-        to {
-            transform: translateY(0);
-        }
-    }
-    
-    @keyframes float {
-        0%, 100% {
-            transform: translateY(0);
-        }
-        50% {
-            transform: translateY(-20px);
-        }
-    }
-    
-    height: 20px;
+    width: 25px;
+    height: 25px;
     background: url('coin.png') no-repeat center center / contain;
+    animation: bounce 1s infinite;
 }
 
 .explosion {
-    position: absolute;
     width: 50px;
     height: 50px;
     background: url('explosion.png') no-repeat center center / contain;
 }
 
+/* UI Elements */
 #score, #power-up-indicator, #mission-indicator, #level-indicator {
     position: absolute;
     top: 10px;
     left: 10px;
     font-size: 18px;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    text-align: center;
 }
 
 #health-bar {
@@ -184,9 +99,10 @@ body {
     right: 10px;
     width: 200px;
     height: 20px;
-    border: 2px solid #ffffff;
+    border: 2px solid #bbe1fa;
     border-radius: 10px;
     overflow: hidden;
+    background: rgba(0, 0, 0, 0.7);
 }
 
 #health-fill {
@@ -196,6 +112,7 @@ body {
     transition: width 0.2s;
 }
 
+/* Screens and Buttons */
 .screen {
     position: absolute;
     width: 100%;
@@ -203,9 +120,10 @@ body {
     display: none;
     justify-content: center;
     align-items: center;
-    background: rgba(0, 0, 0, 0.8);
-    color: #ffffff;
+    background: rgba(0, 0, 0, 0.9);
+    color: #bbe1fa;
     text-align: center;
+    animation: fadeIn 1s ease-in-out;
 }
 
 #start-screen, #game-over-screen, #instructions-screen, #high-scores-screen, #pause-screen {
@@ -217,29 +135,34 @@ body {
 
 .button {
     margin: 10px;
-    padding: 10px 20px;
-    background-color: #ff6347;
+    padding: 15px 30px;
+    background-color: #0f4c75;
     border: none;
     border-radius: 5px;
-    color: #ffffff;
+    color: #bbe1fa;
     font-size: 18px;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s, transform 0.3s;
 }
 
 .button:hover {
-    background-color: #ff4500;
+    background-color: #3282b8;
+    transform: scale(1.1);
 }
 
 #game-over-screen h2, #start-screen h2, #instructions-screen h2, #high-scores-screen h2 {
     margin: 20px 0;
-    font-size: 24px;
+    font-size: 26px;
 }
 
 #player-name {
     padding: 10px;
     font-size: 18px;
     margin: 10px;
+    border: 2px solid #bbe1fa;
+    border-radius: 5px;
+    background: rgba(0, 0, 0, 0.7);
+    color: #bbe1fa;
 }
 
 #high-scores-list {
@@ -250,4 +173,41 @@ body {
 #high-scores-list li {
     margin: 5px 0;
     font-size: 18px;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
 }
