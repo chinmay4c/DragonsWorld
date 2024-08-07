@@ -691,3 +691,149 @@ function createBoss() {
 
         checkBossCollision(boss);
     }, 50);
+
+    function checkBossCollision(boss) {
+        const bossRect = boss.getBoundingClientRect();
+        const dragonRect = dragon.getBoundingClientRect();
+
+        if (
+            dragonRect.left < bossRect.right &&
+            dragonRect.right > bossRect.left &&
+            dragonRect.top < bossRect.bottom &&
+            dragonRect.bottom > bossRect.top
+        ) {
+            health -= 5;
+            updateHealthBar();
+            if (health <= 0) {
+                gameOver();
+            }
+        }
+
+        const fireballs = document.querySelectorAll('.fireball');
+        fireballs.forEach(fireball => {
+            const fireballRect = fireball.getBoundingClientRect();
+            if (
+                fireballRect.left < bossRect.right &&
+                fireballRect.right > bossRect.left &&
+                fireballRect.top < bossRect.bottom &&
+                fireballRect.bottom > bossRect.top
+            ) {
+                bossHealth -= 10;
+                gameScreen.removeChild(fireball);
+                if (bossHealth <= 0) {
+                    defeatBoss(boss, bossLoop);
+                }
+            }
+        });
+    }
+}
+
+function createBossProjectile(bossLeft, bossTop) {
+    const projectile = document.createElement('div');
+    projectile.classList.add('boss-projectile');
+    projectile.style.left = `${bossLeft}px`;
+    projectile.style.top = `${bossTop + 50}px`;
+    gameScreen.appendChild(projectile);
+
+    const projectileLoop = setInterval(() => {
+        const left = parseInt(projectile.style.left);
+        if (left > -20) {
+            projectile.style.left = (left - 5) + 'px';
+            checkCollision(projectile, 'boss-projectile');
+        } else {
+            clearInterval(projectileLoop);
+            gameScreen.removeChild(projectile);
+        }
+    }, 50);
+}
+
+function defeatBoss(boss, bossLoop) {
+    clearInterval(bossLoop);
+    gameScreen.removeChild(boss);
+    score += 1000 * level;
+    updateScore();
+    createExplosion(parseInt(boss.style.left), parseInt(boss.style.top));
+}
+
+function gameLoop() {
+    if (!isPaused) {
+        dragonX += 1;
+        if (dragonX > 750) {
+            gameOver();
+        }
+
+        if (activePowerUp === 'magnet') {
+            const items = document.querySelectorAll('.fireball, .coin');
+            items.forEach(item => {
+                const itemRect = item.getBoundingClientRect();
+                const dragonRect = dragon.getBoundingClientRect();
+                const dx = (dragonRect.left + dragonRect.width / 2) - (itemRect.left + itemRect.width / 2);
+                const dy = (dragonRect.top + dragonRect.height / 2) - (itemRect.top + itemRect.height / 2);
+                const distance = Math.sqrt(dx * dx + dy * dy);
+
+                if (distance < 150) {
+                    item.style.left = `${parseInt(item.style.left) + dx / 10}px`;
+                    item.style.top = `${parseInt(item.style.top) + dy / 10}px`;
+                }
+            });
+        }
+
+        updateMissionProgress();
+
+        if (score > 0 && score % 1000 === 0) {
+            levelUp();
+        }
+
+        updateDragonPosition();
+    }
+    requestAnimationFrame(gameLoop);
+}
+
+function startGame() {
+    dragonX = 0;
+    dragonY = 200;
+    score = 0;
+    coins = 0;
+    health = 100;
+    level = 1;
+    updateScore();
+    updateHealthBar();
+    levelIndicator.textContent = `Level: ${level}`;
+    updateDragonPosition();
+
+    startScreen.classList.add('hidden');
+    gameScreen.classList.remove('hidden');
+    gameOverScreen.classList.add('hidden');
+
+    generateMission();
+    gameStartTime = Date.now();
+
+    fireballInterval = setInterval(createFireball, 2000);
+    obstacleInterval = setInterval(createObstacle, 3000);
+    powerUpInterval = setInterval(createPowerUp, 10000);
+    enemyDragonInterval = setInterval(createEnemyDragon, 5000);
+    coinInterval = setInterval(createCoin, 4000);
+
+    requestAnimationFrame(gameLoop);
+}
+
+function resetGame() {
+    const elements = document.querySelectorAll('.fireball, .obstacle, .power-up, .enemy-dragon, .coin, .boss, .boss-projectile');
+    elements.forEach(element => gameScreen.removeChild(element));
+
+    clearInterval(fireballInterval);
+    clearInterval(obstacleInterval);
+    clearInterval(powerUpInterval);
+    clearInterval(enemyDragonInterval);
+    clearInterval(coinInterval);
+}
+
+function gameOver() {
+    cancelAnimationFrame(gameLoop);
+    resetGame();
+    gameScreen.classList.add('hidden');
+    gameOverScreen.classList.remove('hidden');
+    finalScoreElement.textContent = `Final Score: ${score}`;
+}
+
+loadHighScores();
