@@ -393,3 +393,112 @@ function startGame() {
 
     requestAnimationFrame(gameLoop);
 }
+const highScoresButton = document.getElementById('high-scores-button');
+const highScoresScreen = document.getElementById('high-scores-screen');
+const backFromScoresButton = document.getElementById('back-from-scores-button');
+const highScoresList = document.getElementById('high-scores-list');
+const pauseScreen = document.getElementById('pause-screen');
+const resumeButton = document.getElementById('resume-button');
+const quitButton = document.getElementById('quit-button');
+const playerNameInput = document.getElementById('player-name');
+const submitScoreButton = document.getElementById('submit-score');
+const missionIndicator = document.getElementById('mission-indicator');
+const levelIndicator = document.getElementById('level-indicator');
+
+let highScores = [];
+let currentMission = null;
+let isPaused = false;
+
+highScoresButton.addEventListener('click', showHighScores);
+backFromScoresButton.addEventListener('click', () => {
+    highScoresScreen.classList.add('hidden');
+    startScreen.classList.remove('hidden');
+});
+
+resumeButton.addEventListener('click', resumeGame);
+quitButton.addEventListener('click', quitToMenu);
+submitScoreButton.addEventListener('click', submitScore);
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !startScreen.classList.contains('hidden')) {
+        togglePause();
+    }
+});
+
+function showHighScores() {
+    startScreen.classList.add('hidden');
+    highScoresScreen.classList.remove('hidden');
+    displayHighScores();
+}
+
+function displayHighScores() {
+    highScoresList.innerHTML = '';
+    highScores.sort((a, b) => b.score - a.score);
+    highScores.slice(0, 10).forEach((score, index) => {
+        const li = document.createElement('li');
+        li.textContent = `${index + 1}. ${score.name}: ${score.score}`;
+        highScoresList.appendChild(li);
+    });
+}
+
+function togglePause() {
+    isPaused = !isPaused;
+    if (isPaused) {
+        pauseScreen.classList.remove('hidden');
+        cancelAnimationFrame(gameLoop);
+    } else {
+        pauseScreen.classList.add('hidden');
+        requestAnimationFrame(gameLoop);
+    }
+}
+
+function resumeGame() {
+    togglePause();
+}
+
+function quitToMenu() {
+    isPaused = false;
+    pauseScreen.classList.add('hidden');
+    gameScreen.classList.add('hidden');
+    startScreen.classList.remove('hidden');
+    resetGame();
+}
+
+function submitScore() {
+    const playerName = playerNameInput.value.trim();
+    if (playerName) {
+        highScores.push({ name: playerName, score: score });
+        highScores.sort((a, b) => b.score - a.score);
+        highScores = highScores.slice(0, 10);
+        localStorage.setItem('highScores', JSON.stringify(highScores));
+        showHighScores();
+    }
+}
+
+function loadHighScores() {
+    const savedScores = localStorage.getItem('highScores');
+    if (savedScores) {
+        highScores = JSON.parse(savedScores);
+    }
+}
+
+function generateMission() {
+    const missionTypes = [
+        { type: 'score', target: 50 * level, description: 'Reach {target} points' },
+        { type: 'coins', target: 10 * level, description: 'Collect {target} coins' },
+        { type: 'survive', target: 30 * level, description: 'Survive for {target} seconds' }
+    ];
+
+    const randomMission = missionTypes[Math.floor(Math.random() * missionTypes.length)];
+    currentMission = {
+        ...randomMission,
+        progress: 0,
+        description: randomMission.description.replace('{target}', randomMission.target)
+    };
+
+    updateMissionIndicator();
+}
+
+function updateMissionIndicator() {
+    missionIndicator.textContent = `Mission: ${currentMission.description} (${currentMission.progress}/${currentMission.target})`;
+}
