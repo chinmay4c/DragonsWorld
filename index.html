@@ -8,8 +8,22 @@
 </head>
 <body>
     <div id="game-container">
-        <div id="dragon"></div>
-        <div id="score">Score: 0</div>
+        <div id="start-screen">
+            <h1>Dragon World</h1>
+            <button id="start-button">Start Game</button>
+        </div>
+        <div id="game-screen" class="hidden">
+            <div id="dragon"></div>
+            <div id="score">Score: 0</div>
+            <div id="health-bar">
+                <div id="health-fill"></div>
+            </div>
+        </div>
+        <div id="game-over-screen" class="hidden">
+            <h2>Game Over</h2>
+            <p id="final-score"></p>
+            <button id="restart-button">Play Again</button>
+        </div>
     </div>
     <script src="script.js"></script>
 </body>
