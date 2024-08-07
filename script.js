@@ -393,5 +393,3 @@ function startGame() {
 
     requestAnimationFrame(gameLoop);
 }
-
-// ... (existing event listeners and game initialization)

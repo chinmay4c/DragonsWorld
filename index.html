@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dragon World Game</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -12,27 +13,49 @@
             <h1>Dragon World</h1>
             <button id="start-button">Start Game</button>
             <button id="instructions-button">Instructions</button>
+            <button id="high-scores-button">High Scores</button>
         </div>
         <div id="instructions-screen" class="hidden">
             <h2>How to Play</h2>
-            <p>Use arrow keys to move the dragon.</p>
-            <p>Collect fireballs to increase your score.</p>
-            <p>Avoid obstacles and enemy dragons.</p>
-            <p>Collect power-ups for special abilities.</p>
+            <ul>
+                <li>Use arrow keys to move the dragon</li>
+                <li>Collect fireballs to increase your score</li>
+                <li>Avoid obstacles and enemy dragons</li>
+                <li>Collect power-ups for special abilities</li>
+                <li>Gather coins for extra points</li>
+                <li>Complete missions for bonuses</li>
+            </ul>
             <button id="back-button">Back to Menu</button>
+        </div>
+        <div id="high-scores-screen" class="hidden">
+            <h2>High Scores</h2>
+            <ol id="high-scores-list"></ol>
+            <button id="back-from-scores-button">Back to Menu</button>
         </div>
         <div id="game-screen" class="hidden">
             <div id="dragon"></div>
-            <div id="score">Score: 0</div>
+            <div id="score-container">
+                <div id="score">Score: 0</div>
+                <div id="coins">Coins: 0</div>
+            </div>
             <div id="health-bar">
                 <div id="health-fill"></div>
             </div>
             <div id="power-up-indicator"></div>
+            <div id="level-indicator">Level: 1</div>
+            <div id="mission-indicator"></div>
         </div>
         <div id="game-over-screen" class="hidden">
             <h2>Game Over</h2>
             <p id="final-score"></p>
+            <input type="text" id="player-name" placeholder="Enter your name">
+            <button id="submit-score">Submit Score</button>
             <button id="restart-button">Play Again</button>
+        </div>
+        <div id="pause-screen" class="hidden">
+            <h2>Paused</h2>
+            <button id="resume-button">Resume</button>
+            <button id="quit-button">Quit to Menu</button>
         </div>
     </div>
     <script src="script.js"></script>
